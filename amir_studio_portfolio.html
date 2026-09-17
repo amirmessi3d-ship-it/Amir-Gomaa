@@ -1,904 +1,368 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMIR STUDIO | The Art of Visualization</title>
-    <meta name="description" content="Portfolio of Amir Gomaa - Art Director, 3D Artist, Visual Designer.">
+    <title>Amir Gomaa | The Art of Visualization</title>
     
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- GSAP & Lenis -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
+                    colors: {
+                        dark: {
+                            900: '#050505',
+                            800: '#0f0f0f',
+                            700: '#1a1a1a',
+                        },
+                        accent: '#c92a2a'
+                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        display: ['Oswald', 'sans-serif'],
-                    },
-                    colors: {
-                        bg: '#0a0a0a',
-                        surface: '#141414',
-                        accent: '#cc0000', // Metallic Red
-                        textMain: '#f0f0f0',
-                        textMuted: '#888888',
-                        borderGrid: '#222222'
-                    },
-                    letterSpacing: {
-                        widest: '.25em',
+                        display: ['Syncopate', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
 
+    <!-- Custom CSS -->
     <style>
-        /* Base & Resets */
-        :root {
-            cursor: none; /* Hide default cursor for custom one */
-        }
         body {
-            background-color: #0a0a0a;
-            color: #f0f0f0;
+            background-color: #050505;
+            color: #f5f5f5;
+            cursor: none;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Noise Overlay for cinematic texture */
-        .noise-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         /* Custom Cursor */
-        .cursor-dot {
-            width: 8px; height: 8px;
-            background-color: #cc0000;
-            border-radius: 50%;
+        .cursor-dot, .cursor-outline {
             position: fixed;
             top: 0; left: 0;
             transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
             pointer-events: none;
-            z-index: 10000;
+        }
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background-color: #c92a2a;
         }
         .cursor-outline {
             width: 40px; height: 40px;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            position: fixed;
-            top: 0; left: 0;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 9999;
             transition: width 0.2s, height 0.2s, background-color 0.2s;
         }
         .cursor-hover .cursor-outline {
             width: 60px; height: 60px;
-            background-color: rgba(204, 0, 0, 0.1);
-            border-color: #cc0000;
+            background-color: rgba(201, 42, 42, 0.1);
+            border-color: #c92a2a;
         }
 
-        /* Grid System styling */
-        .swiss-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 1rem;
-        }
-        .border-layout {
-            border: 1px solid #222;
-        }
-        .border-b-layout { border-bottom: 1px solid #222; }
-        .border-r-layout { border-right: 1px solid #222; }
-        .border-t-layout { border-top: 1px solid #222; }
-
-        /* Typography Utilities */
-        .text-outline {
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(240, 240, 240, 0.2);
-        }
-        .text-outline:hover {
-            color: #f0f0f0;
-            -webkit-text-stroke: 1px transparent;
-            transition: color 0.3s ease;
-        }
-
-        /* Preloader */
-        #preloader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0a0a; z-index: 9998;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .loader-text {
-            font-family: 'Oswald', sans-serif;
-            font-size: 2vw; letter-spacing: 0.2em;
-            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0% 100%);
-        }
-
-        /* Hero Spotlight Effect */
-        #hero {
-            position: relative;
-            background: #0a0a0a;
-        }
-        .hero-spotlight {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle 600px at var(--mouse-x) var(--mouse-y), rgba(204, 0, 0, 0.05), transparent 40%);
+        /* Noise Texture */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none;
-            z-index: 1;
-        }
-        .hero-grid-bg {
-            position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: 0;
-            mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+            z-index: 50;
+            opacity: 0.03;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
         }
 
-        /* Image reveals */
-        .reveal-wrap {
-            overflow: hidden;
-            position: relative;
-        }
-        .reveal-image {
-            transform: scale(1.2);
-            transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-
-        /* Project Cards */
-        .project-card {
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .project-img-wrap {
-            overflow: hidden;
-            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        .project-card img {
-            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        .project-card:hover img {
-            transform: scale(1.05);
-        }
-        .project-info {
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-        .project-card:hover .project-info {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .project-overlay {
-            background: linear-gradient(to top, rgba(10,10,10,0.9) 0%, transparent 100%);
-            opacity: 0.6;
-            transition: opacity 0.4s;
-        }
-        .project-card:hover .project-overlay { opacity: 0.9; }
-
-        /* Magnetic Buttons */
-        .magnetic-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        /* Modal Styles */
-        #project-modal {
-            position: fixed; inset: 0;
-            background: #0a0a0a;
-            z-index: 9000;
-            transform: translateY(100%);
-            overflow-y: auto;
-            display: flex; flex-direction: column;
-        }
-        .modal-close {
-            position: fixed; top: 2rem; right: 2rem;
-            z-index: 9001;
-            mix-blend-mode: difference;
-        }
-
-        /* Skills Tag Interaction */
-        .skill-tag {
-            transition: all 0.3s ease;
-        }
-        
-        .skill-tag:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 20px rgba(204, 0, 0, 0.2);
-            border-color: #cc0000;
-            color: #cc0000;
-        }
-
-        /* Marquee Styles */
+        /* Marquee */
         .marquee-container {
             overflow: hidden;
             white-space: nowrap;
-            position: relative;
             display: flex;
-            align-items: center;
-            padding: 2rem 0;
-            background-color: #0a0a0a;
-            border-top: 1px solid #222;
-            border-bottom: 1px solid #222;
         }
-
         .marquee-content {
             display: flex;
-            animation: marquee 30s linear infinite;
+            animation: marquee 20s linear infinite;
         }
-
-        .marquee-content:hover {
+        .marquee-container:hover .marquee-content {
             animation-play-state: paused;
         }
-
-        .marquee-item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4rem;
-            opacity: 0.4;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            filter: grayscale(100%);
-        }
-
-        .marquee-item:hover {
-            opacity: 1;
-            transform: scale(1.05);
-            filter: grayscale(0%);
-        }
-
-        .marquee-item img {
-            max-height: 40px;
-            width: auto;
-            object-fit: contain;
-        }
-
         @keyframes marquee {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } /* Translate by half to loop smoothly with duplicated content */
+            100% { transform: translateX(-50%); }
         }
-        
-        /* Hide scrollbar for clean look */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #333; }
-        ::-webkit-scrollbar-thumb:hover { background: #cc0000; }
+
+        /* Subtle Grid Background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .hover-target { cursor: none; }
     </style>
 </head>
-<body>
-
-    <div class="noise-overlay"></div>
+<body class="antialiased grid-bg">
     
-    <div class="cursor-dot" id="cursor-dot"></div>
-    <div class="cursor-outline" id="cursor-outline"></div>
+    <!-- Noise & Cursor -->
+    <div class="noise"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="loader-text text-white font-display uppercase">AMIR STUDIO</div>
-    </div>
-
-    <nav class="fixed top-0 w-full z-50 mix-blend-difference px-6 py-6 flex justify-between items-center pointer-events-none">
-        <div class="text-white font-display text-xl font-bold tracking-widest pointer-events-auto cursor-hover magnetic-btn" data-strength="20">
-            AMIR<span class="text-accent">.</span>
-        </div>
-        <div class="hidden md:flex gap-8 text-sm font-sans tracking-widest uppercase text-white pointer-events-auto">
-            <a href="#work" class="hover:text-accent transition-colors cursor-hover">Work</a>
-            <a href="#about" class="hover:text-accent transition-colors cursor-hover">About</a>
-            <a href="#services" class="hover:text-accent transition-colors cursor-hover">Services</a>
-            <a href="#contact" class="hover:text-accent transition-colors cursor-hover">Contact</a>
-        </div>
-        <!-- Mobile Menu Toggle -->
-        <div class="md:hidden text-white pointer-events-auto cursor-hover" id="mobile-menu-toggle">
-            MENU
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 top-0 py-6 px-8 flex justify-between items-center mix-blend-difference">
+        <a href="#" class="font-display font-bold text-xl tracking-widest hover-target">AMIR.</a>
+        <div class="hidden md:flex gap-8 text-sm font-medium tracking-wide">
+            <a href="#work" class="hover:text-accent transition-colors hover-target">WORK</a>
+            <a href="#about" class="hover:text-accent transition-colors hover-target">ABOUT</a>
+            <a href="#services" class="hover:text-accent transition-colors hover-target">SERVICES</a>
+            <a href="#contact" class="hover:text-accent transition-colors hover-target">CONTACT</a>
         </div>
     </nav>
 
-    <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden px-4 border-b-layout">
-        <div class="hero-grid-bg"></div>
-        <div class="hero-spotlight"></div>
-        
-        <div class="relative z-10 w-full max-w-screen-2xl mx-auto flex flex-col justify-center h-full pt-20">
-            <div class="mb-4 overflow-hidden">
-                <p class="text-accent font-sans text-sm md:text-base tracking-widest uppercase gs-reveal flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
-                    Available for Remote Work
-                </p>
-            </div>
-            
-            <h1 class="font-display font-bold uppercase leading-[0.85] text-[15vw] md:text-[12vw] text-white mix-blend-difference z-20">
-                <div class="overflow-hidden"><span class="block gs-reveal-up">AMIR</span></div>
-                <div class="overflow-hidden"><span class="block gs-reveal-up text-outline">GOMAA</span></div>
+    <!-- Hero Section -->
+    <section class="h-screen flex flex-col justify-center items-center text-center px-4 relative">
+        <div class="gsap-hero-text">
+            <h1 class="font-display font-bold text-5xl md:text-8xl lg:text-9xl tracking-tighter leading-none mb-4">
+                AMIR <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">GOMAA</span>
             </h1>
-            
-            <div class="mt-12 md:mt-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-t-layout pt-8">
-                <div class="max-w-md font-sans text-textMuted text-sm md:text-base leading-relaxed gs-reveal">
-                    Transforming ideas into immersive visual experiences. A dedicated Graphic Designer and Video Editor committed to quality standards and precise deadlines. Over 18 years of expertise in Creative Direction, Art Direction, 3D Architecture, and Premium Branding.
-                </div>
-                <div class="flex flex-col gap-2 font-display text-sm tracking-widest uppercase text-white gs-reveal">
-                    <span>Art Director</span>
-                    <span>3D Artist</span>
-                    <span>Visual Designer</span>
-                    <span class="text-accent">Video Editor</span>
-                </div>
-                <div class="flex flex-col gap-4 gs-reveal">
-                    <a href="#work" class="magnetic-btn cursor-hover group flex items-center gap-4 text-white font-display tracking-widest text-sm uppercase" data-strength="30">
-                        Explore My Work 
-                        <span class="w-10 h-10 rounded-full border border-borderGrid flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all">
-                            &#8594;
-                        </span>
-                    </a>
-                    <a href="https://youtu.be/7I_-VZIJLg0?feature=shared" target="_blank" class="magnetic-btn cursor-hover flex items-center justify-center gap-2 text-bg bg-white px-6 py-3 font-display tracking-widest text-sm uppercase font-bold hover:bg-accent hover:text-white transition-colors duration-300" data-strength="20">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        Play Showreel
-                    </a>
-                </div>
+            <p class="text-gray-400 font-sans tracking-widest uppercase text-sm md:text-lg mb-8">
+                Art Director • 3D Artist • Visual Designer
+            </p>
+            <p class="text-xl md:text-2xl font-light text-gray-300 max-w-2xl mx-auto mb-12">
+                "Transforming ideas into immersive visual experiences."
+            </p>
+            <a href="#work" class="inline-block border border-white px-8 py-4 font-display text-sm tracking-widest hover:bg-white hover:text-black transition-all duration-300 hover-target">
+                EXPLORE MY WORK →
+            </a>
+        </div>
+    </section>
+
+    <!-- Clients Marquee (Text Only) -->
+    <section class="py-12 border-y border-white/10 bg-dark-800">
+        <div class="marquee-container">
+            <div class="marquee-content items-center gap-16 px-8">
+                <!-- Group 1 -->
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">EDIC DEVELOPMENTS</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">CLAVEL</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">STARTIMES</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">REEDY CITY</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">LIMELIGHT NEWS</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">NEXIT</h3>
+                <!-- Group 2 (Duplicate for smooth scroll) -->
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">EDIC DEVELOPMENTS</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">CLAVEL</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">STARTIMES</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">REEDY CITY</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">LIMELIGHT NEWS</h3>
+                <h3 class="font-display text-2xl text-gray-600 hover:text-accent transition-colors">NEXIT</h3>
             </div>
         </div>
     </section>
 
-    <div class="marquee-container">
-        <div class="marquee-content">
-            <!-- First Set -->
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=EDIC+Developments" alt="EDIC"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Clavel+Compound" alt="Clavel"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=StarTimes" alt="StarTimes"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Reedy" alt="Reedy"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Limelight+News" alt="Limelight News"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Nexit+Construction" alt="Nexit"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Mink" alt="Mink"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Cord+Digital" alt="Cord Digital"></div>
-            
-            <!-- Duplicated Set for Infinite Loop -->
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=EDIC+Developments" alt="EDIC"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Clavel+Compound" alt="Clavel"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=StarTimes" alt="StarTimes"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Reedy" alt="Reedy"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Limelight+News" alt="Limelight News"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Nexit+Construction" alt="Nexit"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Mink" alt="Mink"></div>
-            <div class="marquee-item"><img src="https://placehold.co/150x50/141414/f0f0f0?text=Cord+Digital" alt="Cord Digital"></div>
+    <!-- Projects / Work (CSS Placeholders) -->
+    <section id="work" class="py-32 px-4 md:px-12 max-w-7xl mx-auto">
+        <div class="mb-20">
+            <h2 class="font-display text-4xl md:text-6xl mb-4">SELECTED <span class="text-accent">WORK</span></h2>
+            <p class="text-gray-400 font-light text-lg">01 &mdash; ARCHIVE OF VISUAL EXCELLENCE</p>
         </div>
-    </div>
 
-    <section id="about" class="py-32 px-4 md:px-12 border-b-layout bg-bg relative">
-        <div class="max-w-screen-2xl mx-auto swiss-grid">
-            <div class="col-span-12 md:col-span-4 mb-12 md:mb-0">
-                <h2 class="font-display text-4xl md:text-6xl text-white uppercase leading-tight gs-fade">
-                    <span class="text-accent">18+</span> Years<br>of Visual<br>Excellence.
-                </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            
+            <!-- Project 1 -->
+            <div class="group hover-target">
+                <div class="w-full aspect-[4/3] bg-gradient-to-br from-dark-800 to-dark-700 border border-white/5 overflow-hidden relative flex justify-center items-center mb-6 transition-transform duration-500 group-hover:scale-[1.02]">
+                    <h3 class="font-display text-3xl text-gray-600 opacity-50">EDIC / CLAVEL</h3>
+                    <div class="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">Clavel Compound</h3>
+                        <p class="text-gray-400">Art Direction & Branding</p>
+                    </div>
+                    <span class="text-sm font-mono text-gray-500">2024</span>
+                </div>
             </div>
-            <div class="col-span-12 md:col-span-8 flex flex-col gap-12">
-                <h3 class="font-sans text-2xl md:text-4xl text-textMain font-light leading-snug gs-fade">
-                    "I'm Amir Gomaa, an Art Director and 3D Artist bridging the gap between imagination and photorealistic reality."
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-textMuted font-sans text-sm leading-relaxed gs-fade">
-                    <p>
-                        My journey spans across advertising, branding, architectural visualization, and digital content creation. I don't just create images; I build visual systems that communicate value, luxury, and architectural integrity.
+
+            <!-- Project 2 -->
+            <div class="group hover-target mt-0 md:mt-24">
+                <div class="w-full aspect-[4/3] bg-gradient-to-br from-dark-800 to-dark-700 border border-white/5 overflow-hidden relative flex justify-center items-center mb-6 transition-transform duration-500 group-hover:scale-[1.02]">
+                    <h3 class="font-display text-3xl text-gray-600 opacity-50">REEDY CITY</h3>
+                    <div class="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">Reedy City</h3>
+                        <p class="text-gray-400">3D ArchViz & Marketing</p>
+                    </div>
+                    <span class="text-sm font-mono text-gray-500">2023</span>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="group hover-target">
+                <div class="w-full aspect-[4/3] bg-gradient-to-br from-dark-800 to-dark-700 border border-white/5 overflow-hidden relative flex justify-center items-center mb-6 transition-transform duration-500 group-hover:scale-[1.02]">
+                    <h3 class="font-display text-3xl text-gray-600 opacity-50">STARTIMES</h3>
+                    <div class="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">StarTimes</h3>
+                        <p class="text-gray-400">Broadcast Design & Motion</p>
+                    </div>
+                    <span class="text-sm font-mono text-gray-500">2022</span>
+                </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="group hover-target mt-0 md:mt-24">
+                <div class="w-full aspect-[4/3] bg-gradient-to-br from-dark-800 to-dark-700 border border-white/5 overflow-hidden relative flex justify-center items-center mb-6 transition-transform duration-500 group-hover:scale-[1.02]">
+                    <h3 class="font-display text-3xl text-gray-600 opacity-50">GENESIS AI</h3>
+                    <div class="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">Genesis AI Concept</h3>
+                        <p class="text-gray-400">AI Visual Generation</p>
+                    </div>
+                    <span class="text-sm font-mono text-gray-500">2025</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="py-32 bg-dark-800 border-y border-white/10">
+        <div class="max-w-7xl mx-auto px-4 md:px-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div class="lg:col-span-1">
+                    <h2 class="font-display text-4xl mb-6">SERVICES</h2>
+                    <p class="text-gray-400 font-light leading-relaxed">
+                        Delivering high-end visual solutions across multiple disciplines, combining creative thinking with technical expertise.
                     </p>
-                    <p>
-                        Whether directing a high-end real estate campaign, constructing meticulous 3D environments, or exploring the frontiers of AI-assisted design, my focus remains on absolute premium quality and cinematic composition.
-                    </p>
                 </div>
-                
-                <div class="mt-16 border-t-layout pt-16">
-                    <h4 class="font-display text-sm text-accent tracking-widest uppercase mb-12">Career Timeline</h4>
-                    <div class="relative pl-6 md:pl-0">
-                        <!-- Vertical line for mobile -->
-                        <div class="absolute left-[7px] top-0 bottom-0 w-[1px] bg-borderGrid md:hidden"></div>
-                        
-                        <div class="flex flex-col gap-12">
-                            <!-- Timeline Item -->
-                            <div class="relative md:grid md:grid-cols-12 gap-8 items-center timeline-item">
-                                <div class="hidden md:block col-span-3 text-right font-display text-sm tracking-widest text-textMuted">2026 — Present</div>
-                                <div class="md:col-span-1 relative flex justify-center items-center">
-                                    <div class="w-4 h-4 bg-bg border border-accent rounded-full z-10 hidden md:block"></div>
-                                    <div class="absolute left-[-23px] top-1.5 w-3 h-3 bg-bg border border-accent rounded-full z-10 md:hidden"></div>
-                                    <div class="hidden md:block absolute top-0 bottom-0 w-[1px] bg-borderGrid"></div>
-                                </div>
-                                <div class="col-span-12 md:col-span-8 pb-8 md:pb-0 border-b border-borderGrid md:border-none">
-                                    <div class="md:hidden font-display text-xs tracking-widest text-accent mb-2">2026 — Present</div>
-                                    <h5 class="text-white font-sans text-xl mb-1">Freelance Creative & Art Director</h5>
-                                    <p class="text-textMuted text-sm">Amir Studio — Independent Projects</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Timeline Item -->
-                            <div class="relative md:grid md:grid-cols-12 gap-8 items-center timeline-item">
-                                <div class="hidden md:block col-span-3 text-right font-display text-sm tracking-widest text-textMuted">2023 — 2025</div>
-                                <div class="md:col-span-1 relative flex justify-center items-center">
-                                    <div class="w-3 h-3 bg-borderGrid rounded-full z-10 hidden md:block transition-colors duration-300 hover:bg-white"></div>
-                                    <div class="absolute left-[-22px] top-1.5 w-2 h-2 bg-borderGrid rounded-full z-10 md:hidden"></div>
-                                    <div class="hidden md:block absolute top-0 bottom-0 w-[1px] bg-borderGrid"></div>
-                                </div>
-                                <div class="col-span-12 md:col-span-8 pb-8 md:pb-0 border-b border-borderGrid md:border-none">
-                                    <div class="md:hidden font-display text-xs tracking-widest text-accent mb-2">2023 — 2025</div>
-                                    <h5 class="text-white font-sans text-xl mb-1">Art Director — Marketing</h5>
-                                    <p class="text-textMuted text-sm">EDIC Developments (Clavel Compound)</p>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item -->
-                            <div class="relative md:grid md:grid-cols-12 gap-8 items-center timeline-item">
-                                <div class="hidden md:block col-span-3 text-right font-display text-sm tracking-widest text-textMuted">2021 — 2023</div>
-                                <div class="md:col-span-1 relative flex justify-center items-center">
-                                    <div class="w-3 h-3 bg-borderGrid rounded-full z-10 hidden md:block transition-colors duration-300 hover:bg-white"></div>
-                                    <div class="absolute left-[-22px] top-1.5 w-2 h-2 bg-borderGrid rounded-full z-10 md:hidden"></div>
-                                    <div class="hidden md:block absolute top-0 bottom-0 w-[1px] bg-borderGrid"></div>
-                                </div>
-                                <div class="col-span-12 md:col-span-8 pb-8 md:pb-0 border-b border-borderGrid md:border-none">
-                                    <div class="md:hidden font-display text-xs tracking-widest text-accent mb-2">2021 — 2023</div>
-                                    <h5 class="text-white font-sans text-xl mb-1">Lead 3D Artist / Media Director</h5>
-                                    <p class="text-textMuted text-sm">Cord Digital</p>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item -->
-                            <div class="relative md:grid md:grid-cols-12 gap-8 items-center timeline-item">
-                                <div class="hidden md:block col-span-3 text-right font-display text-sm tracking-widest text-textMuted">2019 — 2020</div>
-                                <div class="md:col-span-1 relative flex justify-center items-center">
-                                    <div class="w-3 h-3 bg-borderGrid rounded-full z-10 hidden md:block transition-colors duration-300 hover:bg-white"></div>
-                                    <div class="absolute left-[-22px] top-1.5 w-2 h-2 bg-borderGrid rounded-full z-10 md:hidden"></div>
-                                    <div class="hidden md:block absolute top-0 bottom-0 w-[1px] bg-borderGrid"></div>
-                                </div>
-                                <div class="col-span-12 md:col-span-8 pb-8 md:pb-0 border-b border-borderGrid md:border-none">
-                                    <div class="md:hidden font-display text-xs tracking-widest text-accent mb-2">2019 — 2020</div>
-                                    <h5 class="text-white font-sans text-xl mb-1">Senior Motion Graphics Designer</h5>
-                                    <p class="text-textMuted text-sm">Promo Station</p>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item -->
-                            <div class="relative md:grid md:grid-cols-12 gap-8 items-center timeline-item">
-                                <div class="hidden md:block col-span-3 text-right font-display text-sm tracking-widest text-textMuted">2015 — 2019</div>
-                                <div class="md:col-span-1 relative flex justify-center items-center">
-                                    <div class="w-3 h-3 bg-borderGrid rounded-full z-10 hidden md:block transition-colors duration-300 hover:bg-white"></div>
-                                    <div class="absolute left-[-22px] top-1.5 w-2 h-2 bg-borderGrid rounded-full z-10 md:hidden"></div>
-                                    <div class="hidden md:block absolute top-0 bottom-0 w-[1px] bg-borderGrid"></div>
-                                </div>
-                                <div class="col-span-12 md:col-span-8 pb-8 md:pb-0 border-b border-borderGrid md:border-none">
-                                    <div class="md:hidden font-display text-xs tracking-widest text-accent mb-2">2015 — 2019</div>
-                                    <h5 class="text-white font-sans text-xl mb-1">Senior Designer / Interior Designer</h5>
-                                    <p class="text-textMuted text-sm">Clue Ad Agency / 35 Champollion</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Timeline Item -->
-                            <div class="relative md:grid md:grid-cols-12 gap-8 items-center timeline-item">
-                                <div class="hidden md:block col-span-3 text-right font-display text-sm tracking-widest text-textMuted">2007 — 2014</div>
-                                <div class="md:col-span-1 relative flex justify-center items-center">
-                                    <div class="w-3 h-3 bg-borderGrid rounded-full z-10 hidden md:block transition-colors duration-300 hover:bg-white"></div>
-                                    <div class="absolute left-[-22px] top-1.5 w-2 h-2 bg-borderGrid rounded-full z-10 md:hidden"></div>
-                                    <div class="hidden md:block absolute top-0 bottom-0 w-[1px] bg-borderGrid"></div>
-                                </div>
-                                <div class="col-span-12 md:col-span-8">
-                                    <div class="md:hidden font-display text-xs tracking-widest text-accent mb-2">2007 — 2014</div>
-                                    <h5 class="text-white font-sans text-xl mb-1">Animator / 3D Artist</h5>
-                                    <p class="text-textMuted text-sm">Coinside Animation Studio</p>
-                                </div>
-                            </div>
-
-                        </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-8 border border-white/10 hover:border-accent transition-colors hover-target bg-dark-900">
+                        <h3 class="font-display text-xl mb-4">ART DIRECTION</h3>
+                        <p class="text-gray-400 text-sm">Brand campaigns, visual systems, and comprehensive creative leadership.</p>
+                    </div>
+                    <div class="p-8 border border-white/10 hover:border-accent transition-colors hover-target bg-dark-900">
+                        <h3 class="font-display text-xl mb-4">3D & CGI</h3>
+                        <p class="text-gray-400 text-sm">Photorealistic architectural, product visualization, and dynamic CGI.</p>
+                    </div>
+                    <div class="p-8 border border-white/10 hover:border-accent transition-colors hover-target bg-dark-900">
+                        <h3 class="font-display text-xl mb-4">BRANDING</h3>
+                        <p class="text-gray-400 text-sm">Visual identities, geometric logotypes, and scalable brand guidelines.</p>
+                    </div>
+                    <div class="p-8 border border-white/10 hover:border-accent transition-colors hover-target bg-dark-900">
+                        <h3 class="font-display text-xl mb-4">MOTION & VIDEO</h3>
+                        <p class="text-gray-400 text-sm">Motion graphics, professional editing, and cinematic promotional content.</p>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
-    <section id="services" class="py-32 border-b-layout bg-surface relative">
-        <div class="max-w-screen-2xl mx-auto px-4 md:px-12">
-            <div class="mb-20 text-center">
-                <h2 class="font-display text-5xl md:text-7xl text-white uppercase text-outline gs-fade">Expertise</h2>
-            </div>
+    <!-- Experience / Timeline -->
+    <section id="about" class="py-32 px-4 md:px-12 max-w-5xl mx-auto">
+        <div class="text-center mb-20">
+            <h2 class="font-display text-4xl md:text-6xl mb-6">EXPERIENCE</h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">18+ years of transforming concepts into professional visual realities across Egypt, KSA, and UAE.</p>
+        </div>
+
+        <div class="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/20 before:to-transparent">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-borderGrid border-layout">
-                <!-- Service Card -->
-                <div class="bg-surface p-12 group hover:bg-[#1a1a1a] transition-colors duration-500 cursor-hover">
-                    <div class="text-accent font-display text-2xl mb-6 font-bold">01</div>
-                    <h3 class="text-white font-display text-2xl uppercase mb-4 tracking-wide group-hover:text-accent transition-colors">Art Direction</h3>
-                    <p class="text-textMuted text-sm leading-relaxed">Guiding brand campaigns, establishing visual systems, and providing comprehensive creative direction from concept to delivery.</p>
-                </div>
-                <!-- Service Card -->
-                <div class="bg-surface p-12 group hover:bg-[#1a1a1a] transition-colors duration-500 cursor-hover">
-                    <div class="text-accent font-display text-2xl mb-6 font-bold">02</div>
-                    <h3 class="text-white font-display text-2xl uppercase mb-4 tracking-wide group-hover:text-accent transition-colors">3D & CGI</h3>
-                    <p class="text-textMuted text-sm leading-relaxed">Crafting photorealistic architectural visualizations, product renders, and immersive spatial environments.</p>
-                </div>
-                <!-- Service Card -->
-                <div class="bg-surface p-12 group hover:bg-[#1a1a1a] transition-colors duration-500 cursor-hover">
-                    <div class="text-accent font-display text-2xl mb-6 font-bold">03</div>
-                    <h3 class="text-white font-display text-2xl uppercase mb-4 tracking-wide group-hover:text-accent transition-colors">Branding</h3>
-                    <p class="text-textMuted text-sm leading-relaxed">Developing robust visual identities, logical brand systems, and cohesive campaign communication strategies.</p>
-                </div>
-                <!-- Service Card -->
-                <div class="bg-surface p-12 group hover:bg-[#1a1a1a] transition-colors duration-500 cursor-hover">
-                    <div class="text-accent font-display text-2xl mb-6 font-bold">04</div>
-                    <h3 class="text-white font-display text-2xl uppercase mb-4 tracking-wide group-hover:text-accent transition-colors">Real Estate Viz</h3>
-                    <p class="text-textMuted text-sm leading-relaxed">Producing high-end exterior and interior CGI, cinematic marketing visuals for luxury developments.</p>
-                </div>
-                <!-- Service Card -->
-                <div class="bg-surface p-12 group hover:bg-[#1a1a1a] transition-colors duration-500 cursor-hover">
-                    <div class="text-accent font-display text-2xl mb-6 font-bold">05</div>
-                    <h3 class="text-white font-display text-2xl uppercase mb-4 tracking-wide group-hover:text-accent transition-colors">Motion & Video</h3>
-                    <p class="text-textMuted text-sm leading-relaxed">Designing motion graphics, executing video editing, CGI animation, and producing compelling showreels.</p>
-                </div>
-                <!-- Service Card -->
-                <div class="bg-surface p-12 group hover:bg-[#1a1a1a] transition-colors duration-500 cursor-hover">
-                    <div class="text-accent font-display text-2xl mb-6 font-bold">06</div>
-                    <h3 class="text-white font-display text-2xl uppercase mb-4 tracking-wide group-hover:text-accent transition-colors">AI Creative</h3>
-                    <p class="text-textMuted text-sm leading-relaxed">Integrating AI-assisted visual development for rapid concept generation and cutting-edge creative production.</p>
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group hover-target">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-dark-900 bg-accent text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2"></div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 bg-dark-800 border border-white/5 group-hover:border-accent/50 transition-colors">
+                    <span class="font-mono text-accent text-sm mb-2 block">2026 - Present</span>
+                    <h3 class="font-bold text-xl mb-1">Freelance / Amir Studio</h3>
+                    <p class="text-gray-400 text-sm">Independent Creative Director & Visual Specialist.</p>
                 </div>
             </div>
 
-            <!-- Skills Interactive System -->
-            <div class="mt-32">
-                <h4 class="font-display text-sm text-center text-textMuted tracking-widest uppercase mb-12">Technical Arsenal</h4>
-                <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto" id="skills-container">
-                    <!-- JS will populate these to add interactive 3D tilt effects -->
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">3ds Max</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">V-Ray</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Photoshop</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Illustrator</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">After Effects</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Premiere Pro</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Blender</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Cinema 4D</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">DaVinci Resolve</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Nuke</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">ZBrush</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:border-accent hover:text-accent transition-colors">Substance Painter</div>
-                    <div class="skill-tag px-6 py-3 border border-borderGrid rounded-full text-white font-sans text-sm cursor-hover hover:bg-white hover:text-bg font-medium transition-colors">AI Creative Tools</div>
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group hover-target">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-dark-900 bg-gray-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2"></div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 bg-dark-800 border border-white/5">
+                    <span class="font-mono text-gray-500 text-sm mb-2 block">2023 - 2025</span>
+                    <h3 class="font-bold text-xl mb-1">EDIC Developments</h3>
+                    <p class="text-gray-400 text-sm">Art Director - Marketing (Clavel Compound).</p>
                 </div>
+            </div>
+
+            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group hover-target">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-dark-900 bg-gray-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2"></div>
+                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 bg-dark-800 border border-white/5">
+                    <span class="font-mono text-gray-500 text-sm mb-2 block">2021 - 2023</span>
+                    <h3 class="font-bold text-xl mb-1">Cord Digital</h3>
+                    <p class="text-gray-400 text-sm">Lead 3D Artist / Media Director.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Showreels Links -->
+    <section class="py-24 bg-accent text-white text-center px-4">
+        <h2 class="font-display text-3xl md:text-5xl mb-8">WATCH THE WORK</h2>
+        <div class="flex flex-col md:flex-row justify-center gap-6">
+            <a href="https://youtu.be/7I_-VZIJLg0?feature=shared" target="_blank" class="px-8 py-4 bg-white text-accent font-bold hover:bg-dark-900 hover:text-white transition-colors hover-target">
+                OFFICIAL SHOWREEL
+            </a>
+            <a href="https://youtu.be/8GqD40043FY?si=jv2ZJJfYvTMcduLR" target="_blank" class="px-8 py-4 border border-white text-white hover:bg-white hover:text-accent transition-colors hover-target">
+                PROJECT COMPILATION
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-32 px-4 md:px-12 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="font-display text-5xl md:text-8xl tracking-tighter mb-6">LET'S CREATE <br><span class="text-gray-600">WHAT'S NEXT.</span></h2>
+            <p class="text-xl text-gray-400">Available for remote creative projects worldwide.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left border-t border-white/10 pt-16">
+            <div>
+                <h4 class="font-display text-sm text-gray-500 mb-4">EMAIL</h4>
+                <a href="mailto:amirmessi3d@gmail.com" class="text-lg hover:text-accent transition-colors hover-target">amirmessi3d@gmail.com</a>
+            </div>
+            <div>
+                <h4 class="font-display text-sm text-gray-500 mb-4">SOCIAL & PORTFOLIO</h4>
+                <div class="flex flex-col gap-2">
+                    <a href="https://www.linkedin.com/in/amirmessi2023" target="_blank" class="hover:text-accent transition-colors hover-target">LinkedIn</a>
+                    <a href="https://www.behance.net/amirmessi2023" target="_blank" class="hover:text-accent transition-colors hover-target">Behance</a>
+                    <a href="https://www.tiktok.com/@amirstudio_video?_r=1&_t=ZS-96plzQhW5Fk" target="_blank" class="hover:text-accent transition-colors hover-target">TikTok</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-display text-sm text-gray-500 mb-4">LOCATION</h4>
+                <p class="text-lg">Cairo, Egypt<br><span class="text-gray-400 text-sm">(Open to Remote Work)</span></p>
             </div>
         </div>
     </section>
 
-    <section id="work" class="py-32 bg-bg border-b-layout">
-        <div class="max-w-screen-2xl mx-auto px-4 md:px-12">
-            <div class="flex justify-between items-end mb-16 border-b-layout pb-8">
-                <h2 class="font-display text-5xl md:text-7xl text-white uppercase leading-none gs-fade">Selected<br>Archive</h2>
-                <div class="hidden md:block font-sans text-sm text-textMuted tracking-widest uppercase">2015 — 2026</div>
-            </div>
+    <footer class="py-8 text-center border-t border-white/10 text-gray-600 text-sm font-mono">
+        &copy; 2026 Amir Studio. All rights reserved.
+    </footer>
 
-            <!-- Project Grid Container (Populated by JS) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12" id="projects-grid">
-                <!-- Projects will be injected here dynamically -->
-            </div>
-            
-            <div class="mt-20 text-center">
-                <a href="https://www.behance.net/amirmessi2023" target="_blank" class="magnetic-btn cursor-hover px-10 py-5 bg-surface border border-borderGrid text-white font-display text-sm tracking-widest uppercase hover:bg-white hover:text-bg transition-colors duration-300" data-strength="40">
-                    Explore The Full Project Archive
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section id="showreel" class="py-32 bg-surface border-b-layout relative overflow-hidden">
-        <div class="max-w-screen-2xl mx-auto px-4 md:px-12 text-center">
-            <h2 class="font-display text-4xl md:text-6xl text-white uppercase mb-16 gs-fade">Watch The Work</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Video 1 -->
-                <div class="relative aspect-video bg-[#050505] border border-borderGrid cursor-hover group gs-reveal">
-                    <!-- To ensure immediate playability without complex modals, embedding YouTube directly. 
-                         For a 'cleaner' look, we cover it with a play button overlay that fades out on interact. -->
-                    <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/7I_-VZIJLg0" title="Official Video Showreel" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>
-
-                <!-- Video 2 -->
-                <div class="relative aspect-video bg-[#050505] border border-borderGrid cursor-hover group gs-reveal">
-                    <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/8GqD40043FY" title="Comprehensive Project Compilation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="min-h-screen flex flex-col justify-between pt-32 pb-12 px-4 md:px-12 bg-bg relative">
-        <div class="hero-grid-bg opacity-30"></div>
-        
-        <div class="max-w-screen-2xl mx-auto w-full z-10 flex-grow flex flex-col justify-center">
-            <h2 class="font-display text-[10vw] md:text-[8vw] uppercase leading-none text-white mix-blend-difference mb-12 cursor-hover gs-fade">
-                Let's Create<br>
-                <span class="text-outline">What's Next.</span>
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 border-t-layout pt-12 gs-fade">
-                <div>
-                    <h4 class="font-display text-sm text-accent tracking-widest uppercase mb-6">Available For</h4>
-                    <ul class="font-sans text-textMuted text-sm space-y-2">
-                        <li>Art Direction</li>
-                        <li>Creative Direction</li>
-                        <li>3D / CGI</li>
-                        <li>Premium Branding</li>
-                        <li>Real Estate Visualization</li>
-                        <li>Motion & Video Editing</li>
-                        <li class="text-accent font-bold pt-4">Remote Creative Projects</li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-display text-sm text-accent tracking-widest uppercase mb-6">Direct Contact</h4>
-                    <a href="mailto:amirmessi3d@gmail.com" class="block font-sans text-xl md:text-2xl text-white hover:text-accent transition-colors cursor-hover mb-2">
-                        amirmessi3d@gmail.com
-                    </a>
-                    <a href="tel:+201018854164" class="block font-sans text-lg text-textMuted hover:text-white transition-colors cursor-hover mb-4">
-                        +20 101 885 4164
-                    </a>
-                    <p class="font-sans text-textMuted text-sm">Cairo, Egypt (Available Worldwide)</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-display text-sm text-accent tracking-widest uppercase mb-6">Socials & Links</h4>
-                    <div class="flex flex-col gap-4 font-sans text-sm">
-                        <a href="https://www.linkedin.com/in/amirstudioa?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="text-white hover:text-accent transition-colors flex justify-between border-b border-borderGrid pb-2 cursor-hover group">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4 fill-current text-textMuted group-hover:text-accent transition-colors" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                                LinkedIn
-                            </span> 
-                            <span class="text-textMuted group-hover:text-accent transition-colors">&#8599;</span>
-                        </a>
-                        <a href="https://www.behance.net/amirmessi2023" target="_blank" class="text-white hover:text-accent transition-colors flex justify-between border-b border-borderGrid pb-2 cursor-hover group">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4 fill-current text-textMuted group-hover:text-accent transition-colors" viewBox="0 0 24 24"><path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.918 2.338-5.697 5.636-5.697 3.565 0 5.464 2.222 5.275 5.626h-8.08c.119 1.488 1.455 2.511 3.013 2.511 1.465 0 2.292-.72 2.658-1.765h2.163zm-5.011-3.692c-.12-1.282-1.121-2.14-2.56-2.14-1.378 0-2.38.868-2.529 2.14h5.089zm-10.742-5.562h-7.973v11.554h7.524c4.662 0 6.035-2.738 5.412-4.996-.445-1.614-1.921-2.456-3.093-2.583 1.341-.219 2.308-1.579 2.015-3.08-.242-1.233-1.674-2.895-3.885-2.895zm-4.973 4.606h2.72c1.077 0 2.452.128 2.645 1.425.213 1.425-1.206 1.425-2.226 1.425h-3.139v-2.85zm0 5.867v-3.056h3.453c1.036 0 2.639.123 2.766 1.637.135 1.614-1.29 1.419-2.215 1.419h-4.004z"/></svg>
-                                Behance
-                            </span> 
-                            <span class="text-textMuted group-hover:text-accent transition-colors">&#8599;</span>
-                        </a>
-                        <a href="https://www.tiktok.com/@amirstudio_video?_r=1&_t=ZS-96plzQhW5Fk" target="_blank" class="text-white hover:text-accent transition-colors flex justify-between border-b border-borderGrid pb-2 cursor-hover group">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4 fill-current text-textMuted group-hover:text-accent transition-colors" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v7.2c0 1.2-.21 2.39-.75 3.45-.63 1.25-1.63 2.27-2.89 2.87-1.31.63-2.8.84-4.23.59-1.43-.24-2.73-.91-3.7-1.92-1.07-1.12-1.74-2.58-1.93-4.13-.23-1.89.26-3.83 1.4-5.32 1.15-1.5 2.8-2.52 4.67-2.84v3.93c-1.39.26-2.57 1.19-3.21 2.45-.6 1.2-.49 2.71.32 3.8.8 1.09 2.21 1.67 3.56 1.46 1.34-.21 2.44-1.17 2.97-2.42.34-.81.44-1.72.44-2.6V.02z"/></svg>
-                                TikTok
-                            </span> 
-                            <span class="text-textMuted group-hover:text-accent transition-colors">&#8599;</span>
-                        </a>
-                        <a href="https://youtu.be/7I_-VZIJLg0?feature=shared" target="_blank" class="text-white hover:text-accent transition-colors flex justify-between border-b border-borderGrid pb-2 cursor-hover group">
-                            <span class="flex items-center gap-2">
-                                <svg class="w-4 h-4 fill-current text-textMuted group-hover:text-accent transition-colors" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                                YouTube Showreel
-                            </span> 
-                            <span class="text-textMuted group-hover:text-accent transition-colors">&#8599;</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <footer class="max-w-screen-2xl mx-auto w-full z-10 flex flex-col md:flex-row justify-between items-center pt-8 border-t-layout mt-16 text-textMuted text-xs font-sans uppercase tracking-widest">
-            <div>&copy; <span id="year"></span> AMIR STUDIO. ALL RIGHTS RESERVED.</div>
-            <div class="mt-4 md:mt-0">THE ART OF VISUALIZATION</div>
-        </footer>
-    </section>
-
-    <!-- Project Modal -->
-    <div id="project-modal" class="hidden">
-        <button class="modal-close text-white font-display text-xl tracking-widest uppercase cursor-hover hover:text-accent transition-colors">
-            Close [X]
-        </button>
-        <div class="max-w-screen-xl mx-auto p-4 md:p-12 w-full mt-24">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                <div class="lg:col-span-8">
-                    <img id="modal-img" src="" alt="Project Visual" class="w-full h-auto object-cover border border-borderGrid">
-                </div>
-                <div class="lg:col-span-4 flex flex-col gap-8">
-                    <div>
-                        <span id="modal-category" class="font-display text-accent text-xs tracking-widest uppercase block mb-4"></span>
-                        <h2 id="modal-title" class="font-display text-4xl md:text-5xl text-white uppercase leading-none mb-6"></h2>
-                        <div class="flex items-center gap-4 font-display text-sm text-textMuted tracking-widest uppercase mb-8 pb-8 border-b border-borderGrid">
-                            <span id="modal-year"></span>
-                            <span class="w-1 h-1 bg-accent rounded-full"></span>
-                            <span id="modal-services"></span>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="font-display text-sm text-white tracking-widest uppercase mb-4">The Challenge & Process</h4>
-                        <p id="modal-desc" class="font-sans text-textMuted text-sm leading-relaxed mb-8"></p>
-                    </div>
-                    <div>
-                        <h4 class="font-display text-sm text-white tracking-widest uppercase mb-4">Technical Arsenal</h4>
-                        <div id="modal-tools" class="flex flex-wrap gap-2">
-                            <!-- Tools injected here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    
     <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        /* --- PROJECT DATA --- */
-        // Updated to use the specific image paths provided for GitHub hosting.
-        const projectsData = [
-            {
-                id: 1,
-                title: "EDIC Developments",
-                category: "04 — ARCHITECTURAL VISUALIZATION",
-                year: "2023 - 2025",
-                services: "Art Direction, Exterior CGI, Billboards",
-                tools: ["3ds Max", "V-Ray", "Photoshop"],
-                desc: "Led the creative direction and produced high-end exterior 3D renderings and comprehensive marketing campaigns for EDIC Developments. The goal was to visualize a luxurious, modern lifestyle, focusing on architectural accuracy and cinematic lighting to drive off-plan sales.",
-                image: "Amir Gomaa Portfolio_Page_29.png" // Page 29 shows EDIC Emdad
-            },
-            {
-                id: 2,
-                title: "Nexit Construction",
-                category: "02 — BRANDING",
-                year: "2022",
-                services: "Corporate Identity, Signage, Uniforms",
-                tools: ["Illustrator", "Photoshop"],
-                desc: "Created a robust and industrial brand identity for Nexit Construction. The design language utilized strong, structured typography and a high-contrast color palette applied consistently across stationery, premium business cards, safety uniforms, vehicles, and construction site hoarding.",
-                image: "Amir Gomaa Portfolio_Page_12.png"
-            },
-            {
-                id: 3,
-                title: "Limelight News",
-                category: "01 — ART DIRECTION & BRANDING",
-                year: "2022",
-                services: "Channel Branding, UI Concept, TV Graphics",
-                tools: ["After Effects", "Illustrator", "Photoshop"],
-                desc: "Executed the complete visual overhaul for Limelight News. This included conceptualizing the TV graphics package, designing the mobile app interface, press cards, and establishing a dynamic, trustworthy news brand aesthetic that stands out in a crowded media landscape.",
-                image: "Amir Gomaa Portfolio_Page_17.png"
-            },
-            {
-                id: 4,
-                title: "Ipetex Studios",
-                category: "01 — ART DIRECTION & UI",
-                year: "2023",
-                services: "Brand Identity, Wordmark, Studio Signage",
-                tools: ["Illustrator", "Photoshop"],
-                desc: "Developed a premium, minimalist brand identity for Ipetex Studios, a photography and film production company. The focus was on a clean, modern aesthetic utilizing a custom wordmark and sleek black-and-white color palette to communicate high-end visual storytelling.",
-                image: "Amir Gomaa Portfolio_Page_16.png"
-            },
-            {
-                id: 5,
-                title: "Heart Care Monitors",
-                category: "02 — BRANDING",
-                year: "2025",
-                services: "Brand Identity, App UI Concept",
-                tools: ["Illustrator", "Photoshop"],
-                desc: "Designed the visual identity for Heart Care, a health-tech company. The logo elegantly combines a human heart with technology signals, symbolizing care and advanced monitoring. Applied the branding across digital touchpoints including mobile applications.",
-                image: "Amir Gomaa Portfolio_Page_30.png"
-            },
-            {
-                id: 6,
-                title: "Clavel Compound",
-                category: "05 — REAL ESTATE",
-                year: "2023 - 2025",
-                services: "Art Direction, Billboards, Marketing",
-                tools: ["Photoshop", "Illustrator"],
-                desc: "Developed the complete outdoor marketing campaign for Clavel Compound in New Zayed. This involved designing impactful billboards and OOH advertising that conveyed the 'Luxurious Life You've Always Wished For', ensuring high visibility and brand recall.",
-                image: "Amir Gomaa Portfolio_Page_63.png"
-            },
-             {
-                id: 7,
-                title: "StarTimes",
-                category: "01 — ART DIRECTION & BRANDING",
-                year: "2020",
-                services: "TV Station Branding, Mobile App, TV Intro",
-                tools: ["After Effects", "Illustrator", "Photoshop"],
-                desc: "Comprehensive branding for StarTimes, a global broadcasting network. The project encompassed a new logo system, symbol grid construction, mobile app UI, website design, office signage, and dynamic TV intro frames.",
-                image: "Amir Gomaa Portfolio_Page_18.png"
-            },
-            {
-                id: 8,
-                title: "Reedy City / Azzar",
-                category: "05 — REAL ESTATE",
-                year: "2024",
-                services: "Art Direction, Social Media, Campaigns",
-                tools: ["Photoshop", "Illustrator"],
-                desc: "Creative direction for Reedy City and Azzar compounds. Crafted compelling social media campaigns and marketing materials emphasizing community, architecture, and connection, culminating in recognition at the Built Design Awards.",
-                image: "Amir Gomaa Portfolio_Page_69.png"
-            }
-        ];
-
-        /* --- RENDER PROJECTS --- */
-        const gridContainer = document.getElementById('projects-grid');
-        projectsData.forEach((proj, index) => {
-            // Alternate sizes for grid variety
-            const colSpan = (index % 3 === 0) ? 'md:col-span-2' : 'md:col-span-1';
-            const aspect = (index % 3 === 0) ? 'aspect-[21/9]' : 'aspect-[4/5] md:aspect-square';
-            
-            const cardHTML = `
-                <div class="project-card ${colSpan} border border-borderGrid bg-surface gs-reveal" data-id="${proj.id}">
-                    <div class="project-img-wrap w-full h-full relative ${aspect}">
-                        <!-- Fallback logic: If the specific image fails to load, it falls back to a placeholder -->
-                        <img src="${proj.image}" onerror="this.onerror=null; this.src='https://placehold.co/800x600/141414/f0f0f0?text=${encodeURIComponent(proj.title)}';" alt="${proj.title}" class="w-full h-full object-cover object-center">
-                        <div class="project-overlay absolute inset-0"></div>
-                        <div class="project-info absolute bottom-0 left-0 w-full p-8 z-10 pointer-events-none">
-                            <span class="font-display text-accent text-xs tracking-widest uppercase block mb-2">${proj.category}</span>
-                            <h3 class="font-display text-3xl md:text-4xl text-white uppercase">${proj.title}</h3>
-                        </div>
-                    </div>
-                </div>
-            `;
-            gridContainer.insertAdjacentHTML('beforeend', cardHTML);
-        });
-
-        /* --- MODAL LOGIC --- */
-        const modal = document.getElementById('project-modal');
-        const modalCloseBtn = document.querySelector('.modal-close');
-        
-        // Ensure modalCloseBtn exists before adding event listener
-        if (modalCloseBtn) {
-            document.querySelectorAll('.project-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = parseInt(card.getAttribute('data-id'));
-                    const proj = projectsData.find(p => p.id === id);
-                    
-                    if(proj) {
-                        const modalImg = document.getElementById('modal-img');
-                        modalImg.src = proj.image;
-                        // Add same fallback to modal image
-                        modalImg.onerror = function() {
-                            this.onerror=null; 
-                            this.src=`https://placehold.co/1200x800/141414/f0f0f0?text=${encodeURIComponent(proj.title)}`;
-                        };
-
-                        document.getElementById('modal-category').textContent = proj.category;
-                        document.getElementById('modal-title').textContent = proj.title;
-                        document.getElementById('modal-year').textContent = proj.year;
-                        document.getElementById('modal-services').textContent = proj.services;
-                        document.getElementById('modal-desc').textContent = proj.desc;
-                        
-                        const toolsContainer = document.getElementById('modal-tools');
-                        toolsContainer.innerHTML = '';
-                        proj.tools.forEach(tool => {
-                            toolsContainer.innerHTML += `<span class="px-3 py-1 border border-borderGrid text-textMuted text-xs uppercase tracking-wider">${tool}</span>`;
-                        });
-
-                        // Open Modal Animation
-                        modal.classList.remove('hidden');
-                        gsap.to(modal, { y: 0, duration: 0.8, ease: "power4.out" });
-                        if(typeof lenis !== 'undefined') lenis.stop(); // Stop main scroll safely
-                    }
-                });
-            });
-
-            modalCloseBtn.addEventListener('click', () => {
-                gsap.to(modal, { 
-                    y: '100%', 
-                    duration: 0.6, 
-                    ease: "power3.in",
-                    onComplete: () => {
-                        modal.classList.add('hidden');
-                        if(typeof lenis !== 'undefined') lenis.start(); // Resume main scroll safely
-                    }
-                });
-            });
-        }
-
-        /* --- SETUP LENIS (SMOOTH SCROLL) --- */
+        // Init Smooth Scrolling
         const lenis = new Lenis({
             duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             gestureDirection: 'vertical',
             smooth: true,
-            mouseMultiplier: 1,
-            smoothTouch: false,
-            touchMultiplier: 2,
-            infinite: false,
         });
 
         function raf(time) {
@@ -907,112 +371,60 @@
         }
         requestAnimationFrame(raf);
 
-        /* --- SETUP GSAP --- */
+        // Custom Cursor Logic
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+            
+            // Delay for outline
+            setTimeout(() => {
+                cursorOutline.style.left = `${posX}px`;
+                cursorOutline.style.top = `${posY}px`;
+            }, 50);
+        });
+
+        // Hover effects for cursor
+        document.querySelectorAll('.hover-target').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                document.body.classList.add('cursor-hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                document.body.classList.remove('cursor-hover');
+            });
+        });
+
+        // GSAP Animations
         gsap.registerPlugin(ScrollTrigger);
 
-        // Preloader Animation
-        window.addEventListener('load', () => {
-            const tl = gsap.timeline();
-            tl.to('.loader-text', { opacity: 0, duration: 0.5, delay: 0.5 })
-              .to('#preloader', { height: 0, duration: 1, ease: "power4.inOut" })
-              .fromTo('.gs-reveal-up', 
-                  { y: 100, opacity: 0 }, 
-                  { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power4.out" }, "-=0.5")
-              .fromTo('.gs-reveal',
-                  { y: 30, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "power3.out" }, "-=0.5");
+        // Hero Animation
+        gsap.from(".gsap-hero-text > *", {
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out",
+            delay: 0.2
         });
 
-        // Scroll Animations
-        const fadeElements = document.querySelectorAll('.gs-fade');
-        fadeElements.forEach(el => {
-            gsap.fromTo(el, 
-                { opacity: 0, y: 50 },
-                { 
-                    opacity: 1, y: 0, 
-                    duration: 1, 
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 85%",
-                    }
-                }
-            );
-        });
-
-        const revealElements = document.querySelectorAll('.gs-reveal:not(#hero .gs-reveal)'); // Exclude hero elements handled in preloader
-        revealElements.forEach(el => {
-             gsap.fromTo(el, 
-                { opacity: 0, y: 30 },
-                { 
-                    opacity: 1, y: 0, 
-                    duration: 0.8, 
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 90%",
-                    }
-                }
-            );
-        });
-
-        /* --- CUSTOM CURSOR & MAGNETIC EFFECT --- */
-        const cursorDot = document.getElementById('cursor-dot');
-        const cursorOutline = document.getElementById('cursor-outline');
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let outlineX = mouseX;
-        let outlineY = mouseY;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Move dot instantly
-            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-            
-            // Update CSS variable for Hero Spotlight
-            document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
-            document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
-        });
-
-        // Animate outline for smooth trailing effect
-        function loop() {
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            cursorOutline.style.transform = `translate(${outlineX}px, ${outlineY}px) translate(-50%, -50%)`;
-            requestAnimationFrame(loop);
-        }
-        requestAnimationFrame(loop);
-
-        // Hover states for cursor
-        const hoverElements = document.querySelectorAll('.cursor-hover, a, button');
-        hoverElements.forEach(el => {
-            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-        });
-
-        // Magnetic Buttons
-        const magneticBtns = document.querySelectorAll('.magnetic-btn');
-        magneticBtns.forEach(btn => {
-            btn.addEventListener('mousemove', (e) => {
-                const rect = btn.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                const strength = btn.getAttribute('data-strength') || 20;
-                
-                gsap.to(btn, {
-                    x: (x / rect.width) * strength,
-                    y: (y / rect.height) * strength,
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
-            });
-            btn.addEventListener('mouseleave', () => {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+        // Scroll Triggers for sections
+        gsap.utils.toArray('section').forEach(section => {
+            gsap.from(section, {
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 80%",
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
             });
         });
-
     </script>
 </body>
 </html>
