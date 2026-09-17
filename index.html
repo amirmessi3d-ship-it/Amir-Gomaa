@@ -216,6 +216,38 @@
             z-index: 9001;
             mix-blend-mode: difference;
         }
+        #mobile-menu-panel {
+            position: fixed;
+            top: 4.5rem;
+            right: 1rem;
+            left: 1rem;
+            background: rgba(10, 10, 10, 0.96);
+            border: 1px solid #222;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transform: translateY(-12px);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 40;
+        }
+        #mobile-menu-panel.is-open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        @media (pointer: coarse) {
+            :root {
+                cursor: auto;
+            }
+            .cursor-dot,
+            .cursor-outline {
+                display: none;
+            }
+        }
 
         /* Skills Tag Interaction */
         .skill-tag {
@@ -307,11 +339,18 @@
             <a href="#services" class="hover:text-accent transition-colors cursor-hover">Services</a>
             <a href="#contact" class="hover:text-accent transition-colors cursor-hover">Contact</a>
         </div>
-        <!-- Mobile Menu Toggle -->
-        <div class="md:hidden text-white pointer-events-auto cursor-hover" id="mobile-menu-toggle">
-            MENU
-        </div>
+        <button type="button" class="md:hidden text-white pointer-events-auto cursor-hover font-display tracking-widest uppercase bg-transparent border border-borderGrid px-3 py-2" id="mobile-menu-toggle" aria-expanded="false" aria-controls="mobile-menu-panel" aria-label="Toggle menu">
+            Menu
+        </button>
     </nav>
+    <div id="mobile-menu-panel" class="md:hidden">
+        <nav class="flex flex-col items-start gap-4 p-5 font-display text-sm tracking-widest uppercase text-white">
+            <a href="#work" class="hover:text-accent transition-colors cursor-hover">Work</a>
+            <a href="#about" class="hover:text-accent transition-colors cursor-hover">About</a>
+            <a href="#services" class="hover:text-accent transition-colors cursor-hover">Services</a>
+            <a href="#contact" class="hover:text-accent transition-colors cursor-hover">Contact</a>
+        </nav>
+    </div>
 
     <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden px-4 border-b-layout">
         <div class="hero-grid-bg"></div>
@@ -869,92 +908,106 @@
 
                         // Open Modal Animation
                         modal.classList.remove('hidden');
-                        gsap.to(modal, { y: 0, duration: 0.8, ease: "power4.out" });
+                        if (typeof gsap !== 'undefined') {
+                            gsap.to(modal, { y: 0, duration: 0.8, ease: "power4.out" });
+                        } else {
+                            modal.style.transform = 'translateY(0)';
+                        }
                         if(typeof lenis !== 'undefined') lenis.stop(); // Stop main scroll safely
                     }
                 });
             });
 
             modalCloseBtn.addEventListener('click', () => {
-                gsap.to(modal, { 
-                    y: '100%', 
-                    duration: 0.6, 
-                    ease: "power3.in",
-                    onComplete: () => {
-                        modal.classList.add('hidden');
-                        if(typeof lenis !== 'undefined') lenis.start(); // Resume main scroll safely
-                    }
-                });
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(modal, { 
+                        y: '100%', 
+                        duration: 0.6, 
+                        ease: "power3.in",
+                        onComplete: () => {
+                            modal.classList.add('hidden');
+                            if(typeof lenis !== 'undefined') lenis.start(); // Resume main scroll safely
+                        }
+                    });
+                } else {
+                    modal.classList.add('hidden');
+                    if(typeof lenis !== 'undefined') lenis.start();
+                }
             });
         }
 
         /* --- SETUP LENIS (SMOOTH SCROLL) --- */
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
-            direction: 'vertical',
-            gestureDirection: 'vertical',
-            smooth: true,
-            mouseMultiplier: 1,
-            smoothTouch: false,
-            touchMultiplier: 2,
-            infinite: false,
-        });
+        let lenis;
+        if (typeof Lenis !== 'undefined') {
+            lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+                mouseMultiplier: 1,
+                smoothTouch: false,
+                touchMultiplier: 2,
+                infinite: false,
+            });
 
-        function raf(time) {
-            lenis.raf(time);
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
             requestAnimationFrame(raf);
         }
-        requestAnimationFrame(raf);
 
         /* --- SETUP GSAP --- */
-        gsap.registerPlugin(ScrollTrigger);
+        if (typeof gsap !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
 
-        // Preloader Animation
-        window.addEventListener('load', () => {
-            const tl = gsap.timeline();
-            tl.to('.loader-text', { opacity: 0, duration: 0.5, delay: 0.5 })
-              .to('#preloader', { height: 0, duration: 1, ease: "power4.inOut" })
-              .fromTo('.gs-reveal-up', 
-                  { y: 100, opacity: 0 }, 
-                  { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power4.out" }, "-=0.5")
-              .fromTo('.gs-reveal',
-                  { y: 30, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "power3.out" }, "-=0.5");
-        });
+            // Preloader Animation
+            window.addEventListener('load', () => {
+                const tl = gsap.timeline();
+                tl.to('.loader-text', { opacity: 0, duration: 0.5, delay: 0.5 })
+                  .to('#preloader', { height: 0, duration: 1, ease: "power4.inOut" })
+                  .fromTo('.gs-reveal-up', 
+                      { y: 100, opacity: 0 }, 
+                      { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power4.out" }, "-=0.5")
+                  .fromTo('.gs-reveal',
+                      { y: 30, opacity: 0 },
+                      { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "power3.out" }, "-=0.5");
+            });
 
-        // Scroll Animations
-        const fadeElements = document.querySelectorAll('.gs-fade');
-        fadeElements.forEach(el => {
-            gsap.fromTo(el, 
-                { opacity: 0, y: 50 },
-                { 
-                    opacity: 1, y: 0, 
-                    duration: 1, 
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 85%",
+            // Scroll Animations
+            const fadeElements = document.querySelectorAll('.gs-fade');
+            fadeElements.forEach(el => {
+                gsap.fromTo(el, 
+                    { opacity: 0, y: 50 },
+                    { 
+                        opacity: 1, y: 0, 
+                        duration: 1, 
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 85%",
+                        }
                     }
-                }
-            );
-        });
+                );
+            });
 
-        const revealElements = document.querySelectorAll('.gs-reveal:not(#hero .gs-reveal)'); // Exclude hero elements handled in preloader
-        revealElements.forEach(el => {
-             gsap.fromTo(el, 
-                { opacity: 0, y: 30 },
-                { 
-                    opacity: 1, y: 0, 
-                    duration: 0.8, 
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 90%",
+            const revealElements = document.querySelectorAll('.gs-reveal:not(#hero .gs-reveal)'); // Exclude hero elements handled in preloader
+            revealElements.forEach(el => {
+                 gsap.fromTo(el, 
+                    { opacity: 0, y: 30 },
+                    { 
+                        opacity: 1, y: 0, 
+                        duration: 0.8, 
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 90%",
+                        }
                     }
-                }
-            );
-        });
+                );
+            });
+        }
 
         /* --- CUSTOM CURSOR & MAGNETIC EFFECT --- */
         const cursorDot = document.getElementById('cursor-dot');
@@ -964,32 +1017,78 @@
         let outlineX = mouseX;
         let outlineY = mouseY;
 
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Move dot instantly
-            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-            
-            // Update CSS variable for Hero Spotlight
-            document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
-            document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
-        });
+        if (cursorDot && cursorOutline) {
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                // Move dot instantly
+                cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+                
+                // Update CSS variable for Hero Spotlight
+                document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
+                document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
+            });
 
-        // Animate outline for smooth trailing effect
-        function loop() {
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            cursorOutline.style.transform = `translate(${outlineX}px, ${outlineY}px) translate(-50%, -50%)`;
+            // Animate outline for smooth trailing effect
+            function loop() {
+                outlineX += (mouseX - outlineX) * 0.15;
+                outlineY += (mouseY - outlineY) * 0.15;
+                cursorOutline.style.transform = `translate(${outlineX}px, ${outlineY}px) translate(-50%, -50%)`;
+                requestAnimationFrame(loop);
+            }
             requestAnimationFrame(loop);
         }
-        requestAnimationFrame(loop);
 
         // Hover states for cursor
         const hoverElements = document.querySelectorAll('.cursor-hover, a, button');
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
             el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+
+        function closeMobileMenu() {
+            if (!mobileMenuPanel || !mobileMenuToggle) return;
+            mobileMenuPanel.classList.remove('is-open');
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('menu-open');
+        }
+
+        if (mobileMenuToggle && mobileMenuPanel) {
+            mobileMenuToggle.addEventListener('click', () => {
+                const isOpen = mobileMenuPanel.classList.toggle('is-open');
+                mobileMenuToggle.setAttribute('aria-expanded', String(isOpen));
+                document.body.classList.toggle('menu-open', isOpen);
+            });
+
+            mobileMenuPanel.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeMobileMenu();
+                if (modal && !modal.classList.contains('hidden')) {
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(modal, {
+                            y: '100%',
+                            duration: 0.6,
+                            ease: 'power3.in',
+                            onComplete: () => {
+                                modal.classList.add('hidden');
+                                if (typeof lenis !== 'undefined') lenis.start();
+                            }
+                        });
+                    } else {
+                        modal.classList.add('hidden');
+                        if (typeof lenis !== 'undefined') lenis.start();
+                    }
+                }
+            }
         });
 
         // Magnetic Buttons
@@ -1001,15 +1100,19 @@
                 const y = e.clientY - rect.top - rect.height / 2;
                 const strength = btn.getAttribute('data-strength') || 20;
                 
-                gsap.to(btn, {
-                    x: (x / rect.width) * strength,
-                    y: (y / rect.height) * strength,
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(btn, {
+                        x: (x / rect.width) * strength,
+                        y: (y / rect.height) * strength,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                }
             });
             btn.addEventListener('mouseleave', () => {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                }
             });
         });
 
